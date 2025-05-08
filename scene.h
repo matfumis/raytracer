@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-struct _pixel{
+struct __attribute__((packed)) _pixel{
   u_int8_t r;
   u_int8_t g;
   u_int8_t b;
@@ -23,7 +23,7 @@ typedef struct _vector * vector_ptr;
 
 struct _sphere {
   vector center;
-  u_int8_t radius;
+  float radius;
   pixel color;
 };
 

@@ -1,10 +1,12 @@
-#include <stdio.h>
+#ifndef _PPM_H
+#define _PPM_H
 
-struct _ppm_image{
-  int width;
-  int height;
-  int offset;
-  int size;
-  FILE * fd;
-  char * data;
-};
+#include <stdio.h>
+#include "scene.h"
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+int save_image_as_ppm(char *filename, pixel_ptr image, int width, int height);
+
+#endif
