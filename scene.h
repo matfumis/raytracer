@@ -1,3 +1,7 @@
+/*
+* Matteo Alessandro Fumis (IN2000249)
+*/
+
 #ifndef _SCENE_H
 #define _SCENE_H
 
@@ -42,6 +46,6 @@ typedef struct _scene scene;
 typedef struct _scene * scene_ptr;
 
 int open_scene_file(char *path, scene_ptr scene);
-pixel_ptr render_image(scene_ptr scene, int width, int height);
+int render_image(scene_ptr scene, pixel_ptr image, int width, int height);
 
 #endif

@@ -1,3 +1,7 @@
+/*
+* Matteo Alessandro Fumis (IN2000249)
+*/
+
 #include "scene.h"
 #include <fcntl.h>
 #include <stdio.h>

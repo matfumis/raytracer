@@ -1,3 +1,7 @@
+/*
+* Matteo Alessandro Fumis (IN2000249)
+*/
+
 #ifndef _PPM_H
 #define _PPM_H
 

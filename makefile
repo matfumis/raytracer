@@ -1,12 +1,19 @@
-CC = gcc
+CC = gcc-14
+CFLAGS = -O3 -Wall -pedantic -fopenmp 
 
 all: main
 
-main: main.o scene.o ppm.o
-	${CC} -o $@ main.o scene.o ppm.o
+main: main.o scene.o ppm.o utils.o
+	${CC} ${CFLAGS} -o $@ main.o scene.o ppm.o utils.o
 
-%.o: %.c scene.h 
-	${CC} -c $<
+scene.o: scene.c scene.h utils.h
+	${CC} ${CFLAGS} -c $<
+
+ppm.o: ppm.c ppm.h scene.h
+	${CC} ${CFLAGS} -c $<
+
+utils.o: utils.c utils.h scene.h
+	${CC} ${CFLAGS} -c $<
 
 PHONY: clean
 

@@ -1,7 +1,14 @@
+/*
+ * Matteo Alessandro Fumis (IN2000249)
+ */
+
 #include "scene.h"
+#include "utils.h"
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -41,91 +48,59 @@ int open_scene_file(char *path, scene_ptr scene) {
   return 0;
 }
 
-double dot_product(vector a, vector b) {
-  return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
-pixel_ptr render_image(scene_ptr scene, int width, int height) {
-
-  pixel_ptr image = malloc(width * height * sizeof(struct _pixel));
+int render_image(scene_ptr scene, pixel_ptr image, int width, int height) {
 
   for (int i = 0; i < width * height; i++) {
-    image[i].r = scene->bg_color.r;
-    image[i].g = scene->bg_color.g;
-    image[i].b = scene->bg_color.b;
+    image[i] = scene->bg_color;
   }
 
-  float cx = scene->viewport_size.x;
-  float cy = scene->viewport_size.y;
-  float cz = scene->viewport_size.z;
+  vector vp = scene->viewport_size;
 
+  #pragma omp parallel for collapse(2)
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
-      float dx = (cx / (width - 1)) * i - (cx / 2);
-      float dy = (cy / (height - 1)) * j - (cy / 2);
-      float dz = cz;
 
-      float vector_lenght = sqrt(dx * dx + dy * dy + dz * dz);
+      vector ray = {(vp.x / (width - 1)) * i - (vp.x / 2),
+                    (vp.y / (height - 1)) * j - (vp.y / 2), vp.z};
 
-      vector ray_direction = {dx / vector_lenght, dy / vector_lenght,
-                              dz / vector_lenght};
+      vector ray_direction = normalize_vector(ray);
 
       float closest_intersection = INFINITY;
-      sphere closest_sphere = {};
+      sphere closest_sphere;
 
       for (int k = 0; k < scene->sphere_count; k++) {
-        float center_x = scene->spheres[k].center.x;
-        float center_y = scene->spheres[k].center.y;
-        float center_z = scene->spheres[k].center.z;
+        vector sphere_center = scene->spheres[k].center;
         float radius = scene->spheres[k].radius;
 
-        vector sphere_center = {center_x, center_y, center_z};
+        float a = inner_product(ray_direction, ray_direction);
+        float b = -2 * inner_product(sphere_center, ray_direction);
+        float c = inner_product(sphere_center, sphere_center) - radius * radius;
 
-        float a = dot_product(ray_direction, ray_direction);
-        float b = -2 * dot_product(sphere_center, ray_direction);
-        float c = dot_product(sphere_center, sphere_center) - radius*radius;
+        float discriminant = b * b - 4 * a * c;
 
-        double discriminant = b * b - 4 * a * c;
-
-        if (discriminant == 0) {
-          float d_intersection = -b / (2 * a);
-          if (d_intersection > 0 && d_intersection < closest_intersection) {
-            closest_intersection = d_intersection;
+        if (discriminant > 0) {
+          float intersection = fmin(fabs(-b + sqrt(discriminant)) / (2 * a),
+                                    fabs(-b - sqrt(discriminant)) / (2 * a));
+          if (intersection < closest_intersection) {
+            closest_intersection = intersection;
             closest_sphere = scene->spheres[k];
           }
         }
-        if (discriminant > 0) {
-          float d_first_intersection = (-b + sqrt(discriminant)) / (2 * a);
-          float d_second_intersection = (-b - sqrt(discriminant)) / (2 * a);
 
-          if (d_first_intersection > 0 && d_second_intersection > 0) {
-            double closest_t =
-                fmin(d_first_intersection, d_second_intersection);
-            if (closest_t < closest_intersection) {
-              closest_intersection = closest_t;
-              closest_sphere = scene->spheres[k];
-            }
-          } else if (d_first_intersection > 0 && d_second_intersection<0) {
-            if (d_first_intersection < closest_intersection) {
-              closest_intersection = d_first_intersection;
-              closest_sphere = scene->spheres[k];
-            }
-          } else if (d_second_intersection > 0 && d_first_intersection < 0) {
-            if (d_second_intersection < closest_intersection) {
-              closest_intersection = d_second_intersection;
-              closest_sphere = scene->spheres[k];
-            }
+        if (discriminant == 0) {
+          float intersection = fabs(-b / (2 * a));
+          if (intersection < closest_intersection) {
+            closest_intersection = intersection;
+            closest_sphere = scene->spheres[k];
           }
         }
       }
 
       if (closest_intersection < INFINITY) {
-        image[j * width + i].r = closest_sphere.color.r;
-        image[j * width + i].g = closest_sphere.color.g;
-        image[j * width + i].b = closest_sphere.color.b;
+        image[(height - 1 - j) * width + i] = closest_sphere.color;
       }
     }
   }
 
-  return image;
+  return 0;
 }
