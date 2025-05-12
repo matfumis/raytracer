@@ -19,54 +19,61 @@ Parameters:
 3. Image width 
 4. Image heigth
 
-It does:
-1. Open the output .ppm file with necessary permissions
-2. Compute header and data size, sets the necessary .ppm file size
-3. Map the file to memory
-4. Write header and copies the content of the rendered image 
-  (array of pixels) to to the file
-5. Close the .ppm file
+The function:
+1. Opens the output .ppm file with necessary permissions
+2. Computes header and data size, sets the necessary .ppm file size
+3. Maps the file to memory
+4. Writes header and copies the content of the rendered image 
+  (array of pixels) from memory to file
+5. Releases resoures
 
 In case of errors while opening .ppm file or mapping, the function returns with an
 error code
 */
 
 int save_image_as_ppm(char *filename, pixel_ptr image, int width, int height) {
-  int image_file = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0666);
-
-  if (image_file <= 0) {
+  FILE *fp = fopen(filename, "w+"); 
+  
+  if (fp == NULL) {
     return 1;
   }
 
+  // computes the total file size
   int header_size = snprintf(NULL, 0, "P6\n%d %d\n255\n", width, height);
   int data_size = width * height * 3;
   int total_file_size = header_size + data_size;
 
-  if (ftruncate(image_file, total_file_size) == -1) {
-    fprintf(stderr,"Failed to set file size");
-    close(image_file);
+  // sets the file size
+  if (ftruncate(fileno(fp), total_file_size) == -1) {
+    fprintf(stderr,"Failed to set file size\n");
+    fclose(fp);
     return 1;
   }
 
+  // maps file to memory
   char *data = mmap((void *)0, total_file_size, PROT_READ | PROT_WRITE,
-                    MAP_SHARED, image_file, 0);
+                    MAP_SHARED, fileno(fp), 0);
 
   if (data == MAP_FAILED) {
-    fprintf(stderr,"Failed to map file");
-    close(image_file);
+    fprintf(stderr,"Failed to map file\n");
+    fclose(fp);
     return 1;
   }
 
+  // prints header to file
   snprintf(data, header_size + 1, "P6\n%d %d\n255\n", width, height);
 
+  // copies the array of pixels to the mapped file, strating from the the end of the header 
   memcpy(data + header_size, image, data_size);
 
+  // File unmapping
   if (munmap(data, total_file_size) == -1) {
-    printf("Error while removing mapping");
-    close(image_file);
+    printf("Error while removing mapping\n");
+    fclose(fp);
     return 1;
   }
 
-  close(image_file);
+  // File closing
+  fclose(fp);
   return 0;
 }

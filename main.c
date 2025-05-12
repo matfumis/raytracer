@@ -19,10 +19,10 @@ Parameters: Nothing or
 3. Image width 
 4. Image heigth
 
-It does:
+The function:
 1. Sets default values to required parameters, which can be overwritten
   by the user when calling ./main
-2. Istantiate and populate a scene struct from a given scene file
+2. Istantiates and populate a scene struct from a given scene file
 3. Allocates the necessary memory for an image of size passed as parameter
   (width and heigth) and renders its content from the scene populated at
   point 2
@@ -63,6 +63,7 @@ int main(int argc, char *argv[]) {
 
   double start = omp_get_wtime();
 
+  // opens scene file
   scene scene;
   if (open_scene_file(scene_filename, &scene) != 0) {
     fprintf(stderr, "Errore while opening the scene file: %s\n",
@@ -70,23 +71,27 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  // allocates memory for an array of pixels of given length
   pixel_ptr image = malloc(width * height * sizeof(struct _pixel));
   if (image == NULL) {
     fprintf(stderr, "Memory allocation failed\n");
     return 1;
   }
 
+  // renders the image
   if (render_image(&scene, image, width, height) != 0) {
     fprintf(stderr, "Error rendering image\n");
     free(image);
     return 1;
   }
 
+  // saves the image
   if (save_image_as_ppm(output_filename, image, width, height) != 0) {
     fprintf(stderr, "Error saving image\n");
     free(image);
     return 1;
   }
+
   free(image);
   double end = omp_get_wtime();
   printf("Wall time: %f seconds\n", end - start);
