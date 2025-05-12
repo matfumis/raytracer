@@ -10,21 +10,52 @@
 #include <sys/time.h>
 #include <time.h>
 
+/*
+Function main()
+
+Parameters: Nothing or
+1. Scene file name
+2. Output image file name
+3. Image width 
+4. Image heigth
+
+It does:
+1. Sets default values to required parameters, which can be overwritten
+  by the user when calling ./main
+2. Istantiate and populate a scene struct from a given scene file
+3. Allocates the necessary memory for an image of size passed as parameter
+  (width and heigth) and renders its content from the scene populated at
+  point 2
+4. Saves the rendered image as ppm file
+
+Execution time is displayed to the user. Allocated resources are freed in case
+of error or successful execution.
+*/
+
 int main(int argc, char *argv[]) {
 
-  int width = 1920;
-  int height = 1080;
+  // rises an error if number of parameters is wrong
+  if (argc != 5 && argc != 1) {
+    fprintf(stderr, "Error while reading parameters. Use the defaults by calling main\n"
+                    "./main"
+                    "or follow the format:\n"
+                    "./main <scene-file.txt> <image-name.ppm> <image-width> <image-height>\n");
+    return 1;
+  }
+
+  // default parameter values
   char *scene_filename = "test.txt";
   char *output_filename = "image.ppm";
+  int width = 1920;
+  int height = 1080;
 
-  if (argc > 1)
+  // User can ovverride parameters
+  if (argc == 5) {
     scene_filename = argv[1];
-  if (argc > 2)
     output_filename = argv[2];
-  if (argc > 3)
     width = atoi(argv[3]);
-  if (argc > 4)
     height = atoi(argv[4]);
+  }
 
   printf("Scene: %s\n", scene_filename);
   printf("Output: %s\n", output_filename);
@@ -34,7 +65,8 @@ int main(int argc, char *argv[]) {
 
   scene scene;
   if (open_scene_file(scene_filename, &scene) != 0) {
-    fprintf(stderr, "Error opening scene file: %s\n", scene_filename);
+    fprintf(stderr, "Errore while opening the scene file: %s\n",
+            scene_filename);
     return 1;
   }
 
