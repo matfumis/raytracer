@@ -17,14 +17,14 @@ Parameters: Nothing or
 1. Scene file name
 2. Output image file name
 3. Image width 
-4. Image heigth
+4. Image height
 
 The function:
 1. Sets default values to required parameters, which can be overwritten
   by the user when calling ./main
-2. Istantiates and populate a scene struct from a given scene file
+2. Instantiates and populate a scene struct from a given scene file
 3. Allocates the necessary memory for an image of size passed as parameter
-  (width and heigth) and renders its content from the scene populated at
+  (width and height) and renders its content from the scene populated at
   point 2
 4. Saves the rendered image as ppm file
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   int width = 1920;
   int height = 1080;
 
-  // User can ovverride parameters
+  // User can overwrite parameters
   if (argc == 5) {
     scene_filename = argv[1];
     output_filename = argv[2];
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   printf("Output: %s\n", output_filename);
   printf("Resolution: %d x %d\n", width, height);
 
-  double start = omp_get_wtime();
+  float start = omp_get_wtime();
 
   // opens scene file
   scene scene;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
   free(image);
   double end = omp_get_wtime();
-  printf("Wall time: %f seconds\n", end - start);
+  printf("Execution time: %f seconds\n", end - start);
 
   return 0;
 }

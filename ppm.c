@@ -17,7 +17,11 @@ Parameters:
 1. Output image file name
 2. Pointer to the rendered image
 3. Image width 
-4. Image heigth
+4. Image height
+
+Output:
+- The function returns an int, 0 if the file is saved with no errors,
+1 if an error occurred in the process
 
 The function:
 1. Opens the output .ppm file with necessary permissions
@@ -25,7 +29,7 @@ The function:
 3. Maps the file to memory
 4. Writes header and copies the content of the rendered image 
   (array of pixels) from memory to file
-5. Releases resoures
+5. Releases recourses
 
 In case of errors while opening .ppm file or mapping, the function returns with an
 error code
@@ -63,7 +67,7 @@ int save_image_as_ppm(char *filename, pixel_ptr image, int width, int height) {
   // prints header to file
   snprintf(data, header_size + 1, "P6\n%d %d\n255\n", width, height);
 
-  // copies the array of pixels to the mapped file, strating from the the end of the header 
+  // copies the array of pixels to the mapped file, starting from the end of the header
   memcpy(data + header_size, image, data_size);
 
   // File unmapping

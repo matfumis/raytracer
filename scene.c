@@ -7,10 +7,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
-
 /*
 Function open_scene_file()
 
@@ -18,15 +15,20 @@ Parameters:
 1. A scene file path
 2. A pointer to a scene struct
 
+Output:
+- The function returns an int, 0 if the scene struct is filled with no errors,
+1 if an error occurred in the process
+
 The function:
 1. Opens the scene file
 2. Scans the scene file header assuming its format, filling the scene struct
 fields
+  - this includes filling as many spheres structs as specified in the scene file
 
-In case of invalid path or malformed scene file, the returns with an error code
+In case of invalid path or malformed scene file, the returns with an error
 */
 
-int open_scene_file(char *scene_file, scene_ptr scene) {
+int open_scene_file(char * scene_file, scene_ptr scene) {
 
   // opens scene file in read mode only
   scene->fd = fopen(scene_file, "r");
@@ -98,7 +100,8 @@ int open_scene_file(char *scene_file, scene_ptr scene) {
 
     // Validates color range [0-255]
     if (scene->spheres[i].color.r > 255 || scene->spheres[i].color.g > 255 ||
-        scene->spheres[i].color.b > 255) {
+    scene->spheres[i].color.b > 255 || scene->spheres[i].color.r < 0 || scene->spheres[i].color.g < 0 ||
+    scene->spheres[i].color.b < 0) {
       fprintf(stderr, "Color values for spheres must be in range [0-255]\n");
       free(scene->spheres);
       fclose(scene->fd);
@@ -116,9 +119,9 @@ float inner_product(vector a, vector b) {
 
 // Vector normalization function
 vector normalize_vector(vector v) {
-  float vector_lenght = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-  vector normalized_vector = {v.x / vector_lenght, v.y / vector_lenght,
-                              v.z / vector_lenght};
+  float vector_length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+  vector normalized_vector = {v.x / vector_length, v.y / vector_length,
+                              v.z / vector_length};
   return normalized_vector;
 }
 
@@ -129,27 +132,29 @@ Parameters:
 1. A pointer to a scene struct
 2. A pointer to an array of pixels
 3. Image width in pixels
-4. Image heigth in pixels
+4. Image height in pixels
+
+Output:
+- The function returns an int, 0 if the array of pixels is filled with no errors
 
 The function, FOR EACH PIXEL of the image:
 1. Computes the ray direction passing through the viewport
 2. Checks, FOR EACH SPHERE in the scene, which one is the
-  the one with the closest to the camera intersected by the ray
+  one with the closest to the camera intersected by the ray
 3. If an intersection is found, sets the color of the closest
-  sphere as the color of the pixel. If not, sets the default bg color
+  sphere (the closest intersection) as the color of the pixel.
+  If not, sets the default bg color
 
-In case of invalid path or malformed scene file, the function returns with an
-error code
 */
 
 int render_image(scene_ptr scene, pixel_ptr image, int width, int height) {
 
   vector vp = scene->viewport_size;
 
-// embarassingly parallel case with openmp
+// openmp parallelization
 #pragma omp parallel for collapse(2)
-  for (int i = 0; i < width; i++) {
-    for (int j = 0; j < height; j++) {
+  for (int j = 0; j < height; j++) {
+    for (int i = 0; i < width; i++) {
 
       // computation of the vector passing through the viewport at pixel (i,j)
       vector ray = {(vp.x / (width - 1)) * i - (vp.x / 2),
