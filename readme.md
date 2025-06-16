@@ -3,19 +3,24 @@
 ---
 ## Overview
 
-This project consists in the implementation of a simple 
-raytracer written in C. Given a properly formatted .txt file
+This project consists in the implementation in C of a simple 
+raytracer. Given a properly formatted `.txt` file
 representing a scene containing a given number of coloured 
 spheres, the program is able to render the correspondent image 
-in the .ppm format.
+in the `.ppm` format. An example of the `.txt` is given in the project 
+files. 
 ---
+
+todo structure
+## Structure
+
 
 ## Usage
 
 ### Compiling
 
 The program can be compiled by simply typing `make`. For cleaning
-up executables and object files, `make clean` can be used.
+up executables and object files use `make clean`.
 
 ### Running
 
