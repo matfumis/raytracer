@@ -35,11 +35,11 @@ typedef struct _sphere sphere;
 typedef struct _sphere * sphere_ptr;
 
 struct _scene {
-  vector viewport_size;
-  pixel bg_color; 
   int sphere_count;
+  pixel bg_color;
   FILE * fd;
   sphere_ptr spheres;
+  vector viewport_size;
 };
 
 typedef struct _scene scene;
