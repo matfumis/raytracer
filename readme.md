@@ -5,21 +5,31 @@
 
 This project consists in the implementation in C of a simple 
 raytracer. Given a properly formatted `.txt` file
-representing a scene containing a given number of coloured 
+representing a scene containing a declared number of coloured 
 spheres, the program is able to render the correspondent image 
-in the `.ppm` format. An example of the `.txt` is given in the project 
+in `.ppm` format. An example of the `.txt` is given in the project 
 files. 
+
 ---
 
-todo structure
+
 ## Structure
 
+The project is structured in the following files:
+
+- `scene.c`: responsible for scene file reading and scene rendering
+- `scene.h`: contains function declarations and auxiliary struct definitions
+- `ppm.c`: responsible for saving the rendered image in `.ppm` format
+- `ppm.h`: contains function declarations
+- `main.c`: responsible for user input parsing and calls to core functions
+
+---
 
 ## Usage
 
 ### Compiling
 
-The program can be compiled by simply typing `make`. For cleaning
+The program can be compiled with `make` command. For cleaning
 up executables and object files use `make clean`.
 
 ### Running
