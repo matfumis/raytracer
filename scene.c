@@ -28,7 +28,7 @@ fields
 In case of invalid path or malformed scene file, the returns with an error
 */
 
-int open_scene_file(char * scene_file, scene_ptr scene) {
+int read_scene_file(char * scene_file, scene_ptr scene) {
 
   // opens scene file in read mode only
   scene->fd = fopen(scene_file, "r");
@@ -140,7 +140,7 @@ Output:
 The function, FOR EACH PIXEL of the image:
 1. Computes the ray direction passing through the viewport
 2. Checks, FOR EACH SPHERE in the scene, which one is the
-  one with the closest to the camera intersected by the ray
+  one the closest to the camera intersected by the ray
 3. If an intersection is found, sets the color of the closest
   sphere (the closest intersection) as the color of the pixel.
   If not, sets the default bg color
@@ -152,7 +152,7 @@ int render_image(scene_ptr scene, pixel_ptr image, int width, int height) {
   vector vp = scene->viewport_size;
 
 // openmp parallelization
-#pragma omp parallel for collapse(2)
+#pragma omp for collapse(2)
   for (int j = 0; j < height; j++) {
     for (int i = 0; i < width; i++) {
 

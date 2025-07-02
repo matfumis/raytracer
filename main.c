@@ -4,7 +4,6 @@
 
 #include "ppm.h"
 #include "scene.h"
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -29,14 +28,14 @@ The function:
 4. Saves the rendered image as ppm file
 
 Execution time is displayed to the user. Allocated resources are freed in case
-of error or successful execution.
+of error or successful execution
 */
 
 int main(int argc, char *argv[]) {
 
   // rises an error if number of parameters is wrong
   if (argc != 5 && argc != 1) {
-    fprintf(stderr, "Error while reading parameters. Use the defaults by calling main\n"
+    fprintf(stderr, "Error while reading parameters. Use the defaults by calling main:\n"
                     "./main"
                     "or follow the format:\n"
                     "./main <scene-file.txt> <image-name.ppm> <image-width> <image-height>\n");
@@ -61,11 +60,9 @@ int main(int argc, char *argv[]) {
   printf("Output: %s\n", output_filename);
   printf("Resolution: %d x %d\n", width, height);
 
-  float start = omp_get_wtime();
-
   // opens scene file
   scene scene;
-  if (open_scene_file(scene_filename, &scene) != 0) {
+  if (read_scene_file(scene_filename, &scene) != 0) {
     fprintf(stderr, "Errore while opening the scene file: %s\n",
             scene_filename);
     return 1;
@@ -93,8 +90,7 @@ int main(int argc, char *argv[]) {
   }
 
   free(image);
-  double end = omp_get_wtime();
-  printf("Execution time: %f seconds\n", end - start);
+  printf("Execution ended\n");
 
   return 0;
 }

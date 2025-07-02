@@ -29,10 +29,10 @@ The function:
 3. Maps the file to memory
 4. Writes header and copies the content of the rendered image 
   (array of pixels) from memory to file
-5. Releases recourses
+5. Releases resources
 
 In case of errors while opening .ppm file or mapping, the function returns with an
-error code
+error
 */
 
 int save_image_as_ppm(char *filename, pixel_ptr image, int width, int height) {
@@ -72,12 +72,12 @@ int save_image_as_ppm(char *filename, pixel_ptr image, int width, int height) {
 
   // File unmapping
   if (munmap(data, total_file_size) == -1) {
-    printf("Error while removing mapping\n");
+    fprintf(stderr, "Error while removing mapping\n");
     fclose(fp);
     return 1;
   }
 
-  // File closing
+  // file closing
   fclose(fp);
   return 0;
 }

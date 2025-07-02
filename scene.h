@@ -45,7 +45,7 @@ struct _scene {
 typedef struct _scene scene;
 typedef struct _scene * scene_ptr;
 
-int open_scene_file(char *path, scene_ptr scene);
+int read_scene_file(char *path, scene_ptr scene);
 int render_image(scene_ptr scene, pixel_ptr image, int width, int height);
 
 #endif
