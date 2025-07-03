@@ -152,7 +152,7 @@ int render_image(scene_ptr scene, pixel_ptr image, int width, int height) {
   vector vp = scene->viewport_size;
 
 // openmp parallelization
-#pragma omp for collapse(2)
+#pragma omp parallel for collapse(2)
   for (int j = 0; j < height; j++) {
     for (int i = 0; i < width; i++) {
 
