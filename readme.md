@@ -1,6 +1,5 @@
 # Raytracer
-
----
+![](assets/result.jpg)
 ## Overview
 
 This project consists in the implementation in C of a simple 
